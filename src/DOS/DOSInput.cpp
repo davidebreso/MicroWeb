@@ -15,7 +15,7 @@
 #include <dos.h>
 #include <stdio.h>
 #include <i86.h>
-#include <conio.h>
+#include <bios.h>
 #include <memory.h>
 #include <stdint.h>
 #include "DOSInput.h"
@@ -189,12 +189,12 @@ void DOSInputDriver::GetMouseStatus(int& buttons, int& x, int& y)
 
 InputButtonCode DOSInputDriver::GetKeyPress() 
 {
-	if (kbhit())
+	if (_bios_keybrd(_KEYBRD_READY))
 	{
-		InputButtonCode keyPress = getch();
-		if (keyPress == 0)
+		InputButtonCode keyPress = _bios_keybrd(_KEYBRD_READ);
+		if (keyPress & 0x00FF)
 		{
-			keyPress = getch() << 8;
+			keyPress &= 0x00FF;
 		}
 		return keyPress;
 	}
