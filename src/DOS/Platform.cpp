@@ -157,6 +157,20 @@ static int AutoDetectVideoMode()
 
 bool Platform::Init(int argc, char* argv[])
 {
+	bool autoVideoMode = true;
+
+	if (argc > 1)
+	{
+		for (int n = 1; n < argc; n++)
+		{
+			if (!stricmp(argv[n], "-noautodetect"))
+			{
+				autoVideoMode = false;
+				break;
+			}
+		}
+	}
+
 	network = new DOSNetworkDriver();
 	if (network)
 	{
@@ -165,7 +179,12 @@ bool Platform::Init(int argc, char* argv[])
 	else FatalError("Could not create network driver");
 
 	int suggestedMode = AutoDetectVideoMode();
-	VideoModeInfo* videoMode = ShowVideoModePicker(suggestedMode);
+	VideoModeInfo* videoMode;
+	if (autoVideoMode) {
+		videoMode = &VideoModeList[suggestedMode];
+	} else {
+		videoMode = ShowVideoModePicker(suggestedMode);
+	}
 	if (!videoMode)
 	{
 		return false;
